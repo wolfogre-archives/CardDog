@@ -13,16 +13,20 @@ import java.sql.Time;
 public class TransactionEntity {
     @Id
     private String refno;
+    private String stuempno;
     private String transdate;
     private Time transtime;
+    private String amount;
 
     public TransactionEntity() {
     }
 
-    public TransactionEntity(String refno, String transdate, Time transtime) {
+    public TransactionEntity(String refno, String stuempno, String transdate, Time transtime, String amount) {
         this.refno = refno;
+        this.stuempno = stuempno;
         this.transdate = transdate;
         this.transtime = transtime;
+        this.amount = amount;
     }
 
     public String getRefno() {
@@ -31,6 +35,14 @@ public class TransactionEntity {
 
     public void setRefno(String refno) {
         this.refno = refno;
+    }
+
+    public String getStuempno() {
+        return stuempno;
+    }
+
+    public void setStuempno(String stuempno) {
+        this.stuempno = stuempno;
     }
 
     public String getTransdate() {
@@ -47,5 +59,13 @@ public class TransactionEntity {
 
     public void setTranstime(Time transtime) {
         this.transtime = transtime;
+    }
+
+    public String getAmount() {
+        return amount;
+    }
+
+    public void setAmount(String amount) {
+        this.amount = amount;
     }
 }
