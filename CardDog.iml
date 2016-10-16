@@ -72,5 +72,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.json:json:20140107" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-core:4.3.3.RELEASE" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework:spring-test:4.3.3.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.jfree:jfreechart:1.0.19" level="project" />
+    <orderEntry type="library" name="Maven: org.jfree:jcommon:1.0.23" level="project" />
   </component>
 </module>
