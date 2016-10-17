@@ -16,17 +16,19 @@ public class TransactionEntity {
     private String stuempno;
     private String transdate;
     private Time transtime;
-    private String amount;
+    private String cardbefbal;
+    private String cardaftbal;
 
     public TransactionEntity() {
     }
 
-    public TransactionEntity(String refno, String stuempno, String transdate, Time transtime, String amount) {
+    public TransactionEntity(String refno, String stuempno, String transdate, Time transtime, String cardbefbal, String cardaftbal) {
         this.refno = refno;
         this.stuempno = stuempno;
         this.transdate = transdate;
         this.transtime = transtime;
-        this.amount = amount;
+        this.cardbefbal = cardbefbal;
+        this.cardaftbal = cardaftbal;
     }
 
     public String getRefno() {
@@ -61,11 +63,19 @@ public class TransactionEntity {
         this.transtime = transtime;
     }
 
-    public String getAmount() {
-        return amount;
+    public String getCardbefbal() {
+        return cardbefbal;
     }
 
-    public void setAmount(String amount) {
-        this.amount = amount;
+    public void setCardbefbal(String cardbefbal) {
+        this.cardbefbal = cardbefbal;
+    }
+
+    public String getCardaftbal() {
+        return cardaftbal;
+    }
+
+    public void setCardaftbal(String cardaftbal) {
+        this.cardaftbal = cardaftbal;
     }
 }

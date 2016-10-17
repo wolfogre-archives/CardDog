@@ -43,9 +43,10 @@ public class AnalysisTimeMoneyInDay{
                 List<TransactionEntity> result = transactionRepository.findByTransdate(date);
                 logger.info(date + "-analysing");
                 for (TransactionEntity it : result) {
-                    if (Double.parseDouble(it.getAmount()) > 0) {
+                    double amount = Double.parseDouble(it.getCardbefbal()) - Double.parseDouble(it.getCardaftbal());
+                    if (amount > 0) {
                         String time = timeFormat.format(it.getTranstime());
-                        sumRecord.put(time, sumRecord.getOrDefault(time, 0.0) + Double.parseDouble(it.getAmount()));
+                        sumRecord.put(time, sumRecord.getOrDefault(time, 0.0) + amount);
                         countRecord.put(time, countRecord.getOrDefault(time, 0) + 1);
                     }
                 }
