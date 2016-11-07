@@ -30,8 +30,8 @@ public class Main implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         //analysisTimeMoneyInDay.run(strings);
-        //chartOfAnalysisTimeMoneyInDay.run(strings);
+        chartOfAnalysisTimeMoneyInDay.run(strings);
         //Thrown when code that is dependent on a keyboard, display, or mouse is called in an environment that does not support a keyboard, display, or mouse.
-        analysisTimeMoneyInDayOfPoor.run(strings);
+        //analysisTimeMoneyInDayOfPoor.run(strings);
     }
 }
