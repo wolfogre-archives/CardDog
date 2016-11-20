@@ -1,7 +1,6 @@
 package com.wolfogre;
 
-import com.wolfogre.service.AnalysisStudentGroup;
-import com.wolfogre.service.FriendshipService;
+import com.wolfogre.service.AnalysisStudentGroupOutputData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -12,15 +11,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class Main implements CommandLineRunner {
 
-    private final AnalysisStudentGroup analysisStudentGroup;
+    private final AnalysisStudentGroupOutputData analysisStudentGroupOutputData;
 
     @Autowired
-    public Main(AnalysisStudentGroup analysisStudentGroup) {
-        this.analysisStudentGroup = analysisStudentGroup;
+    public Main(AnalysisStudentGroupOutputData analysisStudentGroupOutputData) {
+        this.analysisStudentGroupOutputData = analysisStudentGroupOutputData;
     }
 
     @Override
     public void run(String... strings) throws Exception {
-        analysisStudentGroup.run(strings);
+        analysisStudentGroupOutputData.run(strings);
     }
 }

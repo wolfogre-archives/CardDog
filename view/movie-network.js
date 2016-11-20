@@ -44,7 +44,7 @@ var zoomCall = undefined;
 function D3ok() {
 
   // Some constants
-  var WIDTH = 960,
+  var WIDTH = 1366,
       HEIGHT = 600,
       SHOW_THRESHOLD = 2.5;
 
