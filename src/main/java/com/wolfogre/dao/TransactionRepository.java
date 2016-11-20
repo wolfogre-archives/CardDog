@@ -10,4 +10,6 @@ import java.util.List;
  */
 public interface TransactionRepository extends JpaRepository<TransactionEntity, String> {
     public List<TransactionEntity> findByTransdate(String transdate);
+
+    public List<TransactionEntity> findByTransdateOrderByTranstimeAsc(String transdate);
 }

@@ -1,11 +1,9 @@
 package com.wolfogre.service;
 
-import com.wolfogre.dao.EatRepository;
 import com.wolfogre.dao.TransactionRepository;
 import com.wolfogre.domain.TransactionEntity;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 
 import java.io.FileOutputStream;

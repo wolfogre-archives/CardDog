@@ -1,10 +1,18 @@
 package com.wolfogre.service;
 
 import com.wolfogre.dao.TerminalRepository;
+import com.wolfogre.dao.TransactionRepository;
 import com.wolfogre.domain.TerminalEntity;
+import com.wolfogre.domain.TransactionEntity;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 
+import java.sql.Time;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -13,13 +21,18 @@ import java.util.List;
 @Service
 public class AnalysisStudentGroup {
 
+    private final Logger logger = Logger.getLogger(this.getClass());
+
     private final TerminalRepository terminalRepository;
+
+    private final TransactionRepository transactionRepository;
 
     private final FriendshipService friendshipService;
 
     @Autowired
-    public AnalysisStudentGroup(TerminalRepository terminalRepository, FriendshipService friendshipService) {
+    public AnalysisStudentGroup(TerminalRepository terminalRepository, TransactionRepository transactionRepository, FriendshipService friendshipService) {
         this.terminalRepository = terminalRepository;
+        this.transactionRepository = transactionRepository;
         this.friendshipService = friendshipService;
     }
 
@@ -86,14 +99,93 @@ public class AnalysisStudentGroup {
                 343,//宝山咖啡
         };
 
+        HashMap<String, Integer> terminalBelong = new HashMap<>();
         List<TerminalEntity> terminalEntityList = terminalRepository.findAll();
-        //for(TerminalEntity terminalEntity : terminalEntityList)
-        //    System.out.println(terminalEntity.getTermName());
-        System.out.println(friendshipService.get("a", "b"));
-        friendshipService.set("a", "b", 1);
-        System.out.println(friendshipService.get("a", "b"));
-        friendshipService.set("a", "c", 100);
-        System.out.println(friendshipService.get("a", "c"));
-        
+        for(TerminalEntity terminalEntity : terminalEntityList)
+            terminalBelong.put(terminalEntity.getTermId(), terminalEntity.getBusinessId());
+
+        HashMap<String, HashMap<String, Integer>> record = new HashMap<>();
+        HashMap<Integer, LinkedList<TransactionEntity>> queues = new HashMap<>();
+        for(int it : businessList) {
+            queues.put(it, new LinkedList<>());
+        }
+
+        List<TransactionEntity> transactionEntityList = transactionRepository.findByTransdateOrderByTranstimeAsc("20160401");
+        logger.info("transactionEntityList.size " + transactionEntityList.size());
+
+        Time preTime = null;
+        int minuteCount = 0;
+        StopWatch stopWatch = new StopWatch();
+        int ioCount = 0;
+
+        for(TransactionEntity transactionEntity : transactionEntityList) {
+            if(!"3160".equals(transactionEntity.getTranscode())) {
+                continue;
+            }
+
+            LinkedList<TransactionEntity> queue = queues.get(terminalBelong.get(transactionEntity.getTermid()));
+            if(queue == null)
+                continue;
+
+            ++minuteCount;
+            if(preTime == null || transactionEntity.getTranstime().getMinutes() != preTime.getMinutes()) {
+                preTime = transactionEntity.getTranstime();
+                logger.info("Now is " + transactionEntity.getTranstime() + ", minuteCount is " + minuteCount + ", io tims is " + stopWatch.getTotalTimeMillis() / (ioCount == 0 ? 1 : ioCount));
+                logger.info("Yixin queue length is " + queues.get(terminalBelong.get(transactionEntity.getTermid())).size());
+                minuteCount = 0;
+            }
+
+            queue.add(transactionEntity);
+            while(transactionEntity.getTranstime().getTime() - queue.element().getTranstime().getTime() > 10 * 60 * 1000) //去掉十分钟之前的记录
+                queue.remove();
+            Iterator<TransactionEntity> iterator = queue.descendingIterator();
+            iterator.next(); //去掉刚刚入队的记录
+            while(iterator.hasNext()) {
+                TransactionEntity it = iterator.next();
+                if(it.getStuempno().equals(transactionEntity.getStuempno()))
+                    break;
+                stopWatch.start();
+                ++ioCount;
+                addFriendship(transactionEntity.getStuempno(), it.getStuempno(), 1);
+                stopWatch.stop();
+            }
+        }
+
+
+//        for (int month = 4; month <= 6; ++month)
+//            for (int day = 1; day <= 31; ++day) {//之后删掉不存在的日期
+//                String date = "20160" + month + (day < 10 ? ("0" + day) : day);
+//                if (date.equals("20160431") || date.equals("20160631"))
+//                    continue;
+//                List<TransactionEntity> transactionEntityList = transactionRepository.findByTransdateOrderByTranstimeAsc(date);
+//                for(TransactionEntity transactionEntity : transactionEntityList) {
+//                    if(!"3160".equals(transactionEntity.getTranscode()))
+//                        continue;
+//                    LinkedList<TransactionEntity> queue = queues.get(terminalBelong.get(transactionEntity.getTermid()));
+//                    if(queue == null)
+//                        continue;
+//                    queue.add(transactionEntity);
+//                    while(transactionEntity.getTranstime().getTime() - queue.element().getTranstime().getTime() > 10 * 60 * 1000) //去掉十分钟之前的记录
+//                        queue.remove();
+//                    Iterator<TransactionEntity> iterator = queue.descendingIterator();
+//                    iterator.next(); //去掉刚刚入队的记录
+//                    if(iterator.hasNext()) {
+//                        TransactionEntity it = iterator.next();
+//                        if(it.getStuempno().equals(transactionEntity.getStuempno()))
+//                            break;
+//                        addFriendship(transactionEntity.getStuempno(), it.getStuempno(), 1);
+//                    }
+//                }
+//                logger.info("Finish " + date);
+//            }
+
+    }
+
+    private void addFriendship(String first, String second, int value) {
+        Integer oldValue = friendshipService.get(first, second);
+        if(oldValue == null)
+            friendshipService.set(first, second, value);
+        else
+            friendshipService.set(first, second, oldValue + value);
     }
 }
