@@ -110,7 +110,9 @@ public class AnalysisStudentGroup {
             queues.put(it, new LinkedList<>());
         }
 
-        List<TransactionEntity> transactionEntityList = transactionRepository.findByTransdateOrderByTranstimeAsc("20160401");
+        //String date = "20160401";
+        String date = "20160402";
+        List<TransactionEntity> transactionEntityList = transactionRepository.findByTransdateOrderByTranstimeAsc(date);
         logger.info("transactionEntityList.size " + transactionEntityList.size());
 
         Time preTime = null;

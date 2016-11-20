@@ -17,18 +17,6 @@
    -------------------------------------------------------------------------- */
 
 
-// For MSIE < 9, forget it
-function D3notok() {
-  document.getElementById('sidepanel').style.visibility = 'hidden';
-  var nocontent = document.getElementById('nocontent');
-  nocontent.style.visibility = 'visible';
-  nocontent.style.pointerEvents = 'all';
-  var t = document.getElementsByTagName('body');
-  var body = document.getElementsByTagName('body')[0];
-  body.style.backgroundImage = "url('movie-network-screenshot-d.png')";
-  body.style.backgroundRepeat = "no-repeat";
-}
-
 // -------------------------------------------------------------------
 // A number of forward declarations. These variables need to be defined since 
 // they are attached to static code in HTML. But we cannot define them yet
@@ -141,54 +129,7 @@ function D3ok() {
   }
 
 
-  /* Clear all help boxes and select a movie in the network and in the 
-     movie details panel
-  */
-  clearAndSelect = function (id) {
-    toggleDiv('faq','off'); 
-    toggleDiv('help','off'); 
-    selectMovie(id,true); // we use here the selectMovie() closure
-  }
-
-
-  /* Compose the content for the panel with movie details.
-     Parameters: the node data, and the array containing all nodes
-  */
-  function getMovieInfo( n, nodeArray ) {
-    info = '<div id="cover">';
-    if( n.cover )
-      info += '<img class="cover" height="300" src="' + n.cover + '" title="' + n.label + '"/>';
-    else
-      info += '<div class=t style="float: right">' + n.title + '</div>';
-    info +=
-    '<img src="close.png" class="action" style="top: 0px;" title="close panel" onClick="toggleDiv(\'movieInfo\');"/>' +
-    '<img src="target-32.png" class="action" style="top: 280px;" title="center graph on movie" onclick="selectMovie('+n.index+',true);"/>';
-
-    info += '<br/></div><div style="clear: both;">'
-    if( n.genre )
-      info += '<div class=f><span class=l>Genre</span>: <span class=g>' 
-           + n.genre + '</span></div>';
-    if( n.director )
-      info += '<div class=f><span class=l>Directed by</span>: <span class=d>' 
-           + n.director + '</span></div>';
-    if( n.cast )
-      info += '<div class=f><span class=l>Cast</span>: <span class=c>' 
-           + n.cast + '</span></div>';
-    if( n.duration )
-      info += '<div class=f><span class=l>Year</span>: ' + n.year 
-           + '<span class=l style="margin-left:1em;">Duration</span>: ' 
-           + n.duration + '</div>';
-    if( n.links ) {
-      info += '<div class=f><span class=l>Related to</span>: ';
-      n.links.forEach( function(idx) {
-  info += '[<a href="javascript:void(0);" onclick="selectMovie('  
-       + idx + ',true);">' + nodeArray[idx].label + '</a>]'
-      });
-      info += '</div>';
-    }
-    return info;
-  }
-
+ 
 
   // *************************************************************************
 
@@ -252,7 +193,6 @@ function D3ok() {
       .attr('r', function(d) { return node_size(d.score || 3); } )
       .attr('pointer-events', 'all')
       //.on("click", function(d) { highlightGraphNode(d,true,this); } )    
-      .on("click", function(d) { showMoviePanel(d); } )
       .on("mouseover", function(d) { highlightGraphNode(d,true,this);  } )
       .on("mouseout",  function(d) { highlightGraphNode(d,false,this); } );
 
@@ -323,41 +263,6 @@ function D3ok() {
     }
 
 
-    /* --------------------------------------------------------------------- */
-    /* Show the details panel for a movie AND highlight its node in 
-       the graph. Also called from outside the d3.json context.
-       Parameters:
-       - new_idx: index of the movie to show
-       - doMoveTo: boolean to indicate if the graph should be centered
-         on the movie
-    */
-    selectMovie = function( new_idx, doMoveTo ) {
-
-      // do we want to center the graph on the node?
-      doMoveTo = doMoveTo || false;
-      if( doMoveTo ) {
-  s = getViewportSize();
-  width  = s.w<WIDTH ? s.w : WIDTH;
-  height = s.h<HEIGHT ? s.h : HEIGHT;
-  offset = { x : s.x + width/2  - nodeArray[new_idx].x*currentZoom,
-       y : s.y + height/2 - nodeArray[new_idx].y*currentZoom };
-  repositionGraph( offset, undefined, 'move' );
-      }
-      // Now highlight the graph node and show its movie panel
-      highlightGraphNode( nodeArray[new_idx], true );
-      showMoviePanel( nodeArray[new_idx] );
-    }
-
-
-    /* --------------------------------------------------------------------- */
-    /* Show the movie details panel for a given node
-     */
-    function showMoviePanel( node ) {
-      // Fill it and display the panel
-      movieInfoDiv
-  .html( getMovieInfo(node,nodeArray) )
-  .attr("class","panel_on");
-    }
 
       
     /* --------------------------------------------------------------------- */
