@@ -38,7 +38,7 @@ public class FriendshipService {
             second = temp;
         }
         Document result = ((Document)(mongoCollection.find(new Document("first", first).append("second", second)).first()));
-        return result == null ? null :result.get("value", Integer.class);
+        return result == null ? null : result.get("value", Integer.class);
     }
 
     void set(String first, String second, Integer value){
@@ -51,9 +51,9 @@ public class FriendshipService {
         }
         if(mongoCollection.updateOne(
                 new Document("first", first).append("second", second),
-                new Document("$set", new Document("first", second).append("second", first).append("value", value)))
+                new Document("$set", new Document("first", first).append("second", second).append("value", value)))
            .getMatchedCount() == 0) {
-            mongoCollection.insertOne(new Document("first", second).append("second", first).append("value", value));
+            mongoCollection.insertOne(new Document("first", first).append("second", second).append("value", value));
         }
     }
 }
