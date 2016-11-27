@@ -8,6 +8,8 @@ import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Iterator;
+
 /**
  * Created by wolfogre on 11/20/16.
  */
@@ -76,5 +78,18 @@ public class FriendshipService {
     boolean needStop() {
         Document result = ((Document)(commandCollection.find(new Document("command", "shutdown")).first()));
         return result != null && (Boolean)(result.get("value"));
+    }
+
+    long countValueNotLessThan(int value) {
+        return friendshipCollection.count(new Document("value", new Document("$gte", value)));
+    }
+
+    Iterator<Document> getValueNotLessThan(int value) {
+        return friendshipCollection.find(new Document("value", new Document("$gte", value))).iterator();
+    }
+
+    int getMaxValue() {
+        //db.collectionName.find({},{"_id":1}).sort({"_id":-1}).limit(1);
+        return (int)(((Document)friendshipCollection.find().sort(new Document("value", -1)).limit(1).first()).get("value"));
     }
 }
