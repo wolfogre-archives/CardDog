@@ -14,16 +14,24 @@ import org.springframework.stereotype.Service;
 @Service
 public class FriendshipService {
 
-    private final MongoCollection mongoCollection;
+    private final MongoCollection friendshipCollection;
+
+    private final MongoCollection recordCollection;
+
+    private final MongoCollection commandCollection;
 
     private final Logger logger = Logger.getLogger(this.getClass());
 
     @Autowired
     public FriendshipService(MongoClient mongoClient) {
-        mongoCollection = mongoClient.getDatabase("carddog").getCollection("friendship");
-        mongoCollection.createIndex(new Document("first", 1).append("second", 1));
+        friendshipCollection = mongoClient.getDatabase("carddog").getCollection("friendship");
+        friendshipCollection.createIndex(new Document("first", 1).append("second", 1));
 
-        ListIndexesIterable<Document> indexInfo = mongoCollection.listIndexes();
+        recordCollection = mongoClient.getDatabase("carddog").getCollection("record");
+
+        commandCollection = mongoClient.getDatabase("carddog").getCollection("command");
+
+        ListIndexesIterable<Document> indexInfo = friendshipCollection.listIndexes();
         logger.info("indexes of carddog.friendship");
         for(Document document : indexInfo)
             logger.info(document.toString());
@@ -37,7 +45,7 @@ public class FriendshipService {
             first = second;
             second = temp;
         }
-        Document result = ((Document)(mongoCollection.find(new Document("first", first).append("second", second)).first()));
+        Document result = ((Document)(friendshipCollection.find(new Document("first", first).append("second", second)).first()));
         return result == null ? null : result.get("value", Integer.class);
     }
 
@@ -49,11 +57,24 @@ public class FriendshipService {
             first = second;
             second = temp;
         }
-        if(mongoCollection.updateOne(
+        if(friendshipCollection.updateOne(
                 new Document("first", first).append("second", second),
                 new Document("$set", new Document("first", first).append("second", second).append("value", value)))
            .getMatchedCount() == 0) {
-            mongoCollection.insertOne(new Document("first", first).append("second", second).append("value", value));
+            friendshipCollection.insertOne(new Document("first", first).append("second", second).append("value", value));
         }
+    }
+
+    boolean isRecorded(String date) {
+        return recordCollection.count(new Document("date", date)) != 0;
+    }
+
+    void recorded(String date) {
+        recordCollection.insertOne(new Document("date", date));
+    }
+
+    boolean needStop() {
+        Document result = ((Document)(commandCollection.find(new Document("command", "shutdown")).first()));
+        return result != null && (Boolean)(result.get("value"));
     }
 }
